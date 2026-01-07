@@ -1,96 +1,108 @@
-# Terraform Instructions
+# PowerShell Instructions
 
-When working with Terraform files (.tf, .tfvars, .hcl), follow these specific guidelines:
+When working with PowerShell files (.ps1, .psm1, .psd1), follow these specific guidelines:
 
 ## Code Style and Formatting
-- Use 2 spaces for indentation (configured in .editorconfig)
-- Run `terraform fmt` before committing
-- Use snake_case for resource names and variables
-- Group related resources together logically
+- Use 4 spaces for indentation (configured in .editorconfig)
+- Follow PowerShell best practices from the PowerShell Style Guide
+- Use PascalCase for function names and parameters
+- Use approved PowerShell verbs (Get-, Set-, New-, Remove-, etc.)
 
-## Resource Management
-- Use descriptive resource names that indicate their purpose
-- Include tags on all taggable resources with at minimum:
-  - Name
-  - Environment (dev/staging/prod)
-  - Project/Application
-  - Owner/Team
-- Use data sources instead of hardcoded values when possible
+## Function Structure
+- Always include comment-based help for functions
+- Use [CmdletBinding()] for advanced functions
+- Define parameters with types and validation
+- Include examples in help documentation
 
-## Variables and Outputs
-- Define all variables with descriptions and types
-- Use validation rules for variables when appropriate
-- Set default values for optional variables
-- Export useful information as outputs with descriptions
+```powershell
+<#
+.SYNOPSIS
+    Brief description of the function
+.DESCRIPTION
+    Detailed description of what the function does
+.PARAMETER ParameterName
+    Description of the parameter
+.EXAMPLE
+    Example usage of the function
+.NOTES
+    Additional information about the function
+#>
+function Verb-Noun {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$RequiredParameter,
+        
+        [Parameter(Mandatory = $false)]
+        [int]$OptionalParameter = 0
+    )
+    
+    # Function logic here
+}
+```
 
-## State Management
-- Always use remote state for team projects
-- Configure state locking when using remote backends
-- Never commit .tfstate files to version control
-- Use separate state files for different environments
+## Error Handling
+- Use try-catch-finally blocks for error handling
+- Implement proper error reporting with Write-Error
+- Use $ErrorActionPreference appropriately
+- Validate inputs at the beginning of functions
 
-## Modules
-- Create reusable modules for common patterns
-- Follow module best practices:
-  - README.md with usage examples
-  - variables.tf with all input variables
-  - outputs.tf with useful outputs
-  - main.tf with primary resources
-- Pin module versions in production
+## Security Best Practices
+- Never store credentials in plain text
+- Use secure strings for sensitive data
+- Implement proper credential management
+- Validate and sanitize all inputs
+- Use least privilege principles
 
-## Security
-- Use terraform-docs to generate documentation
-- Store sensitive variables in .tfvars files (not committed)
-- Use data sources for existing resources instead of importing
-- Implement resource-level security controls
+## Module Development
+- Create proper module manifests (.psd1)
+- Export only necessary functions
+- Include module help and examples
+- Follow semantic versioning
 
-## Validation and Testing
-- Run `terraform validate` before applying
-- Use `terraform plan` to review changes
-- Consider using tools like tflint or checkov for security scanning
-- Test modules with multiple scenarios
+## PowerShell Specific Features
+- Use PowerShell-native cmdlets when available
+- Leverage the pipeline effectively
+- Use proper parameter sets for different function behaviors
+- Implement whatif and confirm parameters where appropriate
+
+## Testing
+- Write Pester tests for all functions
+- Test both positive and negative scenarios
+- Mock external dependencies
+- Aim for good code coverage
+
+## Documentation
+- Include synopsis, description, parameters, and examples
+- Use comment-based help format
+- Document any prerequisites or dependencies
+- Include version history in module manifests
+
+## Performance
+- Use .NET methods when PowerShell cmdlets are insufficient
+- Avoid unnecessary object creation in loops
+- Use pipeline processing for large datasets
+- Consider using background jobs for long-running tasks
 
 ## File Organization
 ```
-project/
-├── main.tf                 # Primary resources
-├── variables.tf            # Input variables
-├── outputs.tf              # Output values
-├── versions.tf             # Provider requirements
-├── terraform.tfvars.example # Example variables
-├── modules/
-│   └── [module-name]/
-└── environments/
-    ├── dev/
-    ├── staging/
-    └── prod/
+PowerShellProject/
+├── ModuleName.psd1         # Module manifest
+├── ModuleName.psm1         # Module file
+├── Public/                 # Public functions
+│   ├── Get-Something.ps1
+│   └── Set-Something.ps1
+├── Private/                # Private/internal functions
+│   └── Helper-Function.ps1
+├── Tests/                  # Pester tests
+│   ├── ModuleName.Tests.ps1
+│   └── Integration.Tests.ps1
+├── Docs/                   # Documentation
+└── Examples/               # Usage examples
 ```
 
-## Provider Configuration
-- Always specify provider versions in versions.tf
-- Use the latest stable provider versions
-- Configure provider-specific settings appropriately
-- Consider using provider aliases for multi-region deployments
-
-## Task-Based Workflow
-
-When working on this project, follow the task-based approach:
-
-1. **Read SPEC.md first** - Understand the overall project requirements, architecture, and constraints
-2. **Check the tasks/ folder** - Look for numbered task files (e.g., `01-networking.md`, `02-storage.md`)
-3. **Complete tasks in order** - Tasks are numbered to indicate dependencies
-4. **Follow task instructions** - Each task file contains specific requirements and acceptance criteria
-5. **Validate after each task** - Run `terraform validate` and `terraform fmt` before marking complete
-
-### Task File Structure
-Each task file in `tasks/` should contain:
-- **Objective**: What needs to be built
-- **Requirements**: Specific resources and configurations
-- **Acceptance Criteria**: How to verify completion
-- **References**: Links to relevant SPEC.md sections
-
-### When Completing a Task
-- Reference SPEC.md for naming conventions, tags, and architecture
-- Create files following the File Organization structure above
-- Include all required outputs as specified in SPEC.md
-- Test with `terraform validate` before reporting completion
+## Environment Compatibility
+- Test across different PowerShell versions (5.1, 7.x)
+- Consider cross-platform compatibility when possible
+- Handle differences between Windows PowerShell and PowerShell Core
+- Use appropriate compatibility attributes when needed

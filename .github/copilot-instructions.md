@@ -1,108 +1,59 @@
 # GitHub Copilot Instructions
 
-You are an experienced software engineer assisting with infrastructure automation projects using Terraform and PowerShell. Your approach is guided by the following principles and guidelines.
+This is a **template repository** providing GitHub Copilot configuration for Terraform and PowerShell infrastructure projects. When modifying this template or using it as a base, follow these guidelines.
 
-## Core Principles
+## Repository Structure
 
-- **KISS (Keep It Simple, Stupid)**: Prioritize simplicity. Complex solutions are harder to understand, maintain, and debug.
-- **YAGNI (You Aren't Gonna Need It)**: Don't add functionality until necessary. Avoid speculative features.
-- **SRP (Single Responsibility Principle)**: Each component should have one responsibility. Focused components are easier to understand, test, and maintain.
-- **DRY (Don't Repeat Yourself)**: Apply as a last resort. While duplication should be avoided, prioritize clarity and simplicity first.
+- [.github/copilot/terraform.md](copilot/terraform.md) - Terraform-specific instructions (Azure-focused, Terraform 1.5.7)
+- [.github/copilot/powershell.md](copilot/powershell.md) - PowerShell-specific instructions
+- [.github/copilot/azure-pipelines.md](copilot/azure-pipelines.md) - Azure DevOps pipeline instructions (Terraform deployments)
+- [.editorconfig](../.editorconfig) - Formatting rules (2-space for Terraform/YAML, 4-space for PowerShell)
+- [.vscode/settings.json](../.vscode/settings.json) - VS Code workspace settings
+- [examples/](../examples/) - Example README files demonstrating the patterns
 
-### Balancing Principles
+## Core Principles (Priority Order)
 
-- **SRP supports KISS** when it simplifies code by dividing complex classes into logical, focused components
-- **SRP aligns with YAGNI** when it addresses current needs without speculative abstractions
-- **Apply SRP practically** by creating only essential abstractions that deliver immediate benefits
+1. **KISS** - Start with the simplest solution; avoid premature complexity
+2. **YAGNI** - Don't add features until actually needed
+3. **SRP** - One responsibility per component; split only when it simplifies
+4. **DRY** - Extract duplication last, after clarity is established
 
-## Coding Style
+## When Modifying Template Files
 
-- Write readable code that clearly communicates intent
-- Use meaningful variable and function names
-- Keep functions short and focused on a single task
-- Prefer explicit solutions over clever or obscure ones
-- Minimize abstraction—use it only when it genuinely simplifies the code
-- Include comprehensive comments explaining complex logic
-- Add meaningful logs that provide context without excessive noise
-- Implement proper error handling and validation
+- Keep language-specific details in `.github/copilot/{language}.md`, not here
+- Example code blocks should use placeholder values with clear comments (e.g., `"tfstateaccount"  # Replace with actual value`)
+- Anti-patterns sections are valuable—document what NOT to do
+- Pin specific versions (Terraform 1.5.7, exact provider versions) with reasoning
 
-## Problem-Solving Approach
+## Key Patterns in This Template
 
-1. Understand the problem thoroughly
-2. Start with the simplest solution that works
-3. Refactor only when necessary
-4. Consider edge cases and error handling
-5. Check if elements already exist in the codebase before adding new code
-6. Replace deprecated APIs with corresponding alternatives
+### Terraform (see [terraform.md](copilot/terraform.md))
 
-## Documentation Standards
+- Azure regions: `westeurope` (primary), `northeurope` (DR)
+- Environments: `dev`, `uat`, `prod` with validation rules
+- Naming: `<project>-<environment>-<resource>-<instance>`
+- State: Azure Storage backend with partial configuration
 
-- Include docstrings/help comments for functions and modules
-- Add inline comments for complex logic
-- Create README files for new projects or major components
-- Document prerequisites, dependencies, and setup instructions
+### PowerShell (see [powershell.md](copilot/powershell.md))
 
-### README File Requirements
+- Always use `[CmdletBinding()]` for advanced functions
+- Comment-based help with `.SYNOPSIS`, `.DESCRIPTION`, `.EXAMPLE`
+- Public/Private folder structure for modules
 
-Every project should include a README.md with:
+### Azure Pipelines (see [azure-pipelines.md](copilot/azure-pipelines.md))
 
-- **Project Title and Description**: Clear, concise explanation of what the project does
-- **Prerequisites**: Required tools, versions, and dependencies
-- **Installation/Setup**: Step-by-step instructions to get started
-- **Usage**: Examples of how to use the project
-- **Configuration**: Environment variables, settings, and customization options
-- **Contributing**: Guidelines for contributors (if applicable)
-- **License**: License information
-- **Contact/Support**: How to get help or report issues
+- Use `extends` templates for security, `template` includes for reusability
+- Separate service connections per environment (`Azure-Dev-Terraform`, `Azure-Prod-Terraform`)
+- Environment-based deployments with approval gates on `uat`/`prod`
+- Store secrets in Key Vault-linked variable groups, never in YAML
 
-## Project Workflow
+## Documentation Requirements
 
-### Getting Started
+- Every project needs a README.md with: Purpose, Prerequisites, Setup, Usage, Configuration
+- Store planning docs in `docs/` directory with timestamp naming: `docs/plan-{yyyy-MM-dd_hh-mm}.md`
 
-- **Document timestamp**: Record the session start timestamp (format: `yyyy-MM-dd_hh-mm`)
+## Security
 
-### Planning and Documentation
-
-- **Documentation location**: All documentation files must be stored in the `docs` directory
-- Before generating code, create a `docs/plan-{timestamp}.md` file
-- Generate a detailed enumerated task list in `docs/tasks-{timestamp}.md`
-- Create a detailed improvements plan in `docs/plan.md`
-- Task items should have placeholders `[ ]` for marking as done `[x]` upon completion
-- **Critical Review**: Review the plan and tasks against Core Principles (KISS, YAGNI, SRP, DRY) before implementation
-- **Request User Review**: After completing the plan and task list, request user approval before proceeding
-
-### Implementation Process
-
-- Follow the task list in `docs/tasks.md`
-- Mark tasks as completed `[x]` as you progress
-- Implement changes according to the documented plan
-- Commit all work to the branch upon completion
-
-## Security Best Practices
-
-- Never hardcode sensitive information (passwords, API keys, etc.)
-- Use environment variables or secure key management systems
-- Follow the principle of least privilege
-- Implement input validation and sanitization
-- Use secure communication protocols
-
-## Version Control
-
-- Write descriptive commit messages
-- Follow conventional commit format when possible
-- Keep commits focused and atomic
-- Include relevant issue references
-
-## Testing and Validation
-
-- Include unit tests where applicable
-- Validate configurations before deployment
-- Use linting tools and formatters
-- Test in non-production environments first
-
-## Project Structure
-
-- Maintain consistent directory structure
-- Separate concerns appropriately
-- Use modular design patterns
-- Keep configuration files organized and documented
+- Never hardcode secrets—use environment variables or Key Vault
+- Service Principal credentials: document but never commit actual values
+- Validate all inputs; follow least privilege
